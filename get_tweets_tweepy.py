@@ -31,13 +31,14 @@ FILENAME = 'test_tweet_ids.txt' #this is just a sub-set of tweet ids taken from 
 #Start cache check
 def get_tweet(found_id):
     if found_id in CACHE_DICTION:
-        print("\nGetting cached data...\n")
         return CACHE_DICTION[found_id]
     else:
-        print("\nRetrieving from Twitter...\n")
-        resp = api.get_status(found_id) #resp is a class 'tweepy.models.Status'
-        json_str = json.dumps(resp._json) #json_str var is str type
-        json_obj = json.loads(json_str) #json_obj var is dict type
+        try:
+            resp = api.get_status(found_id) #resp is a class 'tweepy.models.Status'
+            json_str = json.dumps(resp._json) #json_str var is str type
+            json_obj = json.loads(json_str) #json_obj var is dict type
+        except:
+            json_obj = {}
         CACHE_DICTION[found_id] = json_obj #creating new entry in cache dict where key = 'found_id' & value = 'json_obj' which is a dict
         dumped_json_cache = json.dumps(CACHE_DICTION)
         fw = open(CACHE_FNAME,"w")
