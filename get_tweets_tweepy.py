@@ -29,7 +29,12 @@ api = tweepy.API(auth)
 FILENAME = 'test_tweet_ids.txt' #this is just a sub-set of tweet ids taken from 'training_set_1_ids.txt'
 # FILENAME = 'test_tweet_ids_10.txt'
 
-#Start cache check
+#Start funct to grab vars from Tweet
+def get_tweet_vars(tweet):
+    pass
+#End funct to grab vars from Tweet
+
+#Start funct for cache check
 def get_tweet(found_id):
     if found_id in CACHE_DICTION:
         #if we get strange results in cache like missing child tweets then we may need to add the call to get_tweet() here
@@ -56,8 +61,9 @@ def get_tweet(found_id):
         #end recursive call to get_tweet()
 
         return CACHE_DICTION[found_id]
-#End cache check
+#End funct for cache check
 
+#Start funct to read in Tweet IDs from file
 def read_in_tweet_ids():
     with open(FILENAME, 'r') as infile:
         for line in infile:
@@ -66,6 +72,7 @@ def read_in_tweet_ids():
                 get_tweet(found_id)
             except:
                 pass #having exception message print here was causing duplicate messages when get_tweet failed
+#End funct to read in Tweet IDs from file
 
 if __name__ == "__main__":
     check = read_in_tweet_ids()
