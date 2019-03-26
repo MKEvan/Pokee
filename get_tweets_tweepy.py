@@ -1,6 +1,9 @@
 import tweepy
 import json
 import secret_data
+import sys #needed to print chars to Git Bash, probly just Windows issue
+import codecs #needed to print chars to Git Bash, probly just Windows issue
+sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer) #needed to print chars to Git Bash, probly just Windows issue
 
 #Start getting keys & secrets for running Twitter user, you will need your own user with details saved in a file named 'secret_data.txt' to run this
 CONSUMER_KEY = secret_data.CONSUMER_KEY
@@ -26,19 +29,32 @@ auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 api = tweepy.API(auth)
 #End OAuth code
 
-FILENAME = 'test_tweet_ids.txt' #this is just a sub-set of tweet ids taken from 'training_set_1_ids.txt'
-# FILENAME = 'test_tweet_ids_10.txt'
+# FILENAME = 'test_tweet_ids.txt' #this is just a sub-set of tweet ids taken from 'training_set_1_ids.txt'
+FILENAME = 'test_tweet_ids_10.txt'
 
 #Start funct to grab vars from Tweet
 def get_tweet_vars(tweet):
-    pass
+    try:
+        #set a number of vars for potential use
+        tweet_text = tweet['text']
+        tweet_in_reply_to_status_id_str = tweet['in_reply_to_status_id_str']
+        tweet_in_reply_to_screen_name = tweet['in_reply_to_screen_name']
+        tweet_entities_hashtags = tweet['entities']['hashtags']
+        tweet_entities_symbols = tweet['entities']['symbols']
+        tweet_entities_user_mentions = tweet['entities']['user_mentions']
+        tweet_entities_urls = tweet['entities']['urls']
+
+    except Exception as e:
+        print('Exception in get_tweet_vars:{}\nProblematic Tweet:{}\n\n'.format(e, tweet))
 #End funct to grab vars from Tweet
 
 #Start funct for cache check
 def get_tweet(found_id):
     if found_id in CACHE_DICTION:
         #if we get strange results in cache like missing child tweets then we may need to add the call to get_tweet() here
-        return CACHE_DICTION[found_id]
+        # return CACHE_DICTION[found_id]
+        if CACHE_DICTION[found_id]: #simple check if dict is populated or not
+            get_tweet_vars(CACHE_DICTION[found_id])
     else:
         try:
             resp = api.get_status(found_id) #resp is a class 'tweepy.models.Status'
@@ -60,7 +76,9 @@ def get_tweet(found_id):
             get_tweet(in_reply_id) 
         #end recursive call to get_tweet()
 
-        return CACHE_DICTION[found_id]
+        # return CACHE_DICTION[found_id]
+        if CACHE_DICTION[found_id]: #simple check if dict is populated or not
+            get_tweet_vars(CACHE_DICTION[found_id])
 #End funct for cache check
 
 #Start funct to read in Tweet IDs from file
